@@ -72,16 +72,9 @@ class NodoCompuesto<T> extends Nodo<T>{
     //Metodo que cuenta los nodos que cumplen con el predicado
     cumplen(p:Predicado<T>):number{
 
-        let cont: number = 0;
+        let cont: number = 0;//creo que definir esta variable acá está demás
 
-        if(p.cumple(this.valor)){//verifico si el metodo cumple del objeto Predicado es true en el nodo principal
-            cont++;//incrementamos el contador si
-        }
-
-        //veamos si los hijos del nodo tambien cumplen con el predicado p
-        for(const hijo of this.hijos){
-            cont+=hijo.cumplen(p);
-        }
+        super.cumplen(p);//reutilizar codigo de manera limpia - sobreescritura por refinamiento!
 
         //lo que cambia en esta estructura es verificar si el nodo interno a partr de que exista, cumple con el predicado p
         if(this.nodo_interno && p.cumple(this.nodo_interno.valor)){

@@ -8,11 +8,15 @@ class Celda2 <T>{
 
     public reducir (f:(e1:T,e2:T)=>T, predicado:(e:T)=>boolean):T{
 
+        //esto está mal programado a nivel de lógica
+        //si cumple con el predicado el return es this.valor (sin aplicarle f)
+        //con el uso de optional contemplo el caso en el que no cumpla con el predicado para no retornar nada
+
         let operacion=this.valor;//inicializo una variable igual al atributo valor
 
         //si no cumple el predicado, operacion se limita a devolver al valor inicializado anteriormente - this.valor
         if (predicado(this.valor)){
-           operacion = f(this.valor,this.valor) 
+           operacion = f(this.valor,this.valor) //return debería ser this.valor sin aplicarle f
         }
 
         return operacion;
@@ -39,7 +43,9 @@ class Caja2<T> extends Celda2<T>{
         let elemento: Celda2<T>;
          
        
+            //tengo que corregir esto
             for(elemento of this.elementos){//elemento es la variable que se asigna a cada elemento en cada iteracion y elementos es lo iterable
+                //el predicado lo tiene que cumplir el valor con f aplicado, no f en sí (CREOOOO)
                 if(predicado(elemento.valor) && predicado(valor)){//tengo que validar que valor de caja cumpla?
                     console.log("Valor de la variable valor antes de f = ",valor)
                     console.log("Elemento en la iteracion antes de f es:",elemento)//por control
@@ -67,11 +73,11 @@ const cajaa2: Caja2<number> = new Caja2(37,[celdaa1,celdaa2]);
 
 const sumaa =  (a:number,b:number) => a+b;
 
-const predicado = (n:number) => n % 2 ===0; //N MOD 2 = 0 ¿?
+const esPar = (n:number) => n % 2 ===0; //N MOD 2 = 0 ¿?
 
 console.log(cajaa2)
 
-console.log("resultado de la operacion reducir: ", cajaa2.reducir(sumaa,predicado))
+console.log("resultado de la operacion reducir: ", cajaa2.reducir(sumaa,esPar))
 
 console.log("Hola Mundo");
 
