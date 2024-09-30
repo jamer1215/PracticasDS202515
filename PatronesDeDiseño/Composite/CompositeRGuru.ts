@@ -106,7 +106,7 @@ class Composite extends Component {
 /**
  * El código cliente trabaja con todos los componentes a través de la interfaz base.
  */
-function clientCode(component: Component) {
+function clienteCode(component: Component) {
     // Ejecuta la operación del componente y la muestra en consola
     console.log(`RESULT: ${component.operation()}`);
 }
@@ -116,7 +116,7 @@ function clientCode(component: Component) {
  */
 const simple = new Leaf();
 console.log('Cliente: Tengo un componente simple:');
-clientCode(simple); // Muestra el resultado de la operación de la hoja simple
+clienteCode(simple); // Muestra el resultado de la operación de la hoja simple
 console.log('');
 
 /**
@@ -131,7 +131,7 @@ branch2.add(new Leaf());
 tree.add(branch1); // Agrega la primera rama al árbol
 tree.add(branch2); // Agrega la segunda rama al árbol
 console.log('Cliente: Ahora tengo un árbol composite:');
-clientCode(tree); // Muestra el resultado de la operación del árbol composite
+clienteCode(tree); // Muestra el resultado de la operación del árbol composite
 console.log('');
 
 /**
