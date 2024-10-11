@@ -31,13 +31,15 @@ interface Funcion<T>{
 
 //Usa (NO IMPLEMENTA) las dos interfaces anteriores
 class Nodo<T> {
-    constructor(public valor:T, public hijos:Nodo<T>[]=[]){
+    constructor(public valor:T, public hijos?:Nodo<T>[]){
         this.valor=valor;
     }
 
     // Método para agregar un hijo
     agregarHijo(hijo: Nodo<T>) {
-        this.hijos.push(hijo);
+
+        if(this.hijos)
+         this.hijos.push(hijo);
     }
 
     //ESTO ES LO QUE ME PIDEN IMPLEMENTAR
@@ -51,9 +53,13 @@ class Nodo<T> {
         }
 
         //veamos si los hijos del nodo tambien cumplen con el predicado p
-        for(const hijo of this.hijos){
-            cont+=hijo.cumplen(p);
+
+        if(this.hijos){//si los hijos existen...
+            for(const hijo of this.hijos){
+                cont+=hijo.cumplen(p);
+            }
         }
+
 
         return cont;
 
@@ -63,7 +69,7 @@ class Nodo<T> {
 
 class NodoCompuesto<T> extends Nodo<T>{
 
-    constructor(valor:T, hijos:Nodo<T>[]=[], public nodo_interno?: Nodo<T>){
+    constructor(valor:T, hijos?:Nodo<T>[], public nodo_interno?: Nodo<T>){
         super(valor,hijos);
         this.nodo_interno=nodo_interno;
     }
@@ -72,11 +78,10 @@ class NodoCompuesto<T> extends Nodo<T>{
     //Metodo que cuenta los nodos que cumplen con el predicado
     cumplen(p:Predicado<T>):number{
 
-        let cont: number = 0;//creo que definir esta variable acá está demás
-
-        super.cumplen(p);//reutilizar codigo de manera limpia - sobreescritura por refinamiento!
+        let cont=super.cumplen(p);//reutilizar codigo de manera limpia - sobreescritura por refinamiento!
 
         //lo que cambia en esta estructura es verificar si el nodo interno a partr de que exista, cumple con el predicado p
+        
         if(this.nodo_interno && p.cumple(this.nodo_interno.valor)){
             cont++;
         }
@@ -108,3 +113,7 @@ class NodoCompuesto<T> extends Nodo<T>{
     const nodojamal = new Nodo<String>('Jamal',[nodogabriel,nodocristhian,nodoluis, nodowilliam])//por lo visto este funciona de pinga.
 
    console.log(nodojamal.cumplen(jamal));//funciona de pinga
+
+    const comp1 = new NodoCompuesto<String>('Jamal',[nodojamal],nodojamal)
+
+    console.log(`Valor de comp1: "${comp1.cumplen(jamal)}"`);//funciona de pinga

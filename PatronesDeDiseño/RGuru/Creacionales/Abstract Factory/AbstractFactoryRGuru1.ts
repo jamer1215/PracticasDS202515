@@ -5,7 +5,7 @@
 // Normalmente, los productos de una familia pueden colaborar entre sí. Una familia de productos 
 // puede tener muchas variantes, pero los productos de una variante son incompatibles con los productos de otra.
 interface GUIFactory {
-    createButton(): Button; // Método para crear un botón (producto abstracto).
+    createButton(): Botonsito; // Método para crear un botón (producto abstracto).
     createCheckbox(): Checkbox; // Método para crear un checkbox (producto abstracto).
 }
 
@@ -14,7 +14,7 @@ interface GUIFactory {
 // Por ejemplo, 'WinFactory' crea botones y checkboxes con estilo Windows.
 class WinFactory implements GUIFactory {
     // Este método crea un botón con estilo Windows.
-    public createButton(): Button {
+    public createButton(): Botonsito {
         return new WinButton(); // Se instancia un botón concreto de Windows.
     }
 
@@ -28,7 +28,7 @@ class WinFactory implements GUIFactory {
 // Garantiza que los botones y checkboxes sean compatibles entre sí dentro del estilo macOS.
 class MacFactory implements GUIFactory {
     // Método para crear un botón con estilo macOS.
-    public createButton(): Button {
+    public createButton(): Botonsito {
         return new MacButton(); // Se instancia un botón concreto de macOS.
     }
 
@@ -40,13 +40,13 @@ class MacFactory implements GUIFactory {
 
 // La interfaz 'Button' representa un producto abstracto de la familia.
 // Todas las variantes de productos deben implementar esta interfaz.
-interface Button {
+interface Botonsito {
     paint(): void; // Método que representa el comportamiento de renderización del botón.
 }
 
 // 'WinButton' es un producto concreto que implementa la interfaz 'Button'.
 // Representa un botón que sigue las convenciones de diseño de Windows.
-class WinButton implements Button {
+class WinButton implements Botonsito {
     public paint(): void {
         console.log('Renderizando un botón estilo Windows'); // Comportamiento concreto para Windows.
     }
@@ -54,7 +54,7 @@ class WinButton implements Button {
 
 // 'MacButton' es otra implementación concreta de la interfaz 'Button'.
 // Representa un botón que sigue las convenciones de diseño de macOS.
-class MacButton implements Button {
+class MacButton implements Botonsito {
     public paint(): void {
         console.log('Renderizando un botón estilo macOS'); // Comportamiento concreto para macOS.
     }
@@ -86,12 +86,12 @@ class MacCheckbox implements Checkbox {
 // No tiene conocimiento de las implementaciones concretas de los productos ni de las fábricas.
 // Trabaja únicamente con tipos abstractos como 'GUIFactory', 'Button' y 'Checkbox'.
 // Esto permite cambiar fácilmente entre fábricas y productos en tiempo de ejecución.
-class Application {
+class Applic {
     // 'factory' es la referencia a la fábrica abstracta que produce los componentes gráficos (botón, checkbox).
     private factory: GUIFactory;
 
     // 'button' es el producto concreto que será instanciado por la fábrica.
-    private button!: Button;//! --> es decirle explícitamente a TypeScript que confías en que la propiedad button 
+    private button!: Botonsito;//! --> es decirle explícitamente a TypeScript que confías en que la propiedad button 
     //será asignada antes de ser utilizada, usando el operador !.
     //Esto le dice a TypeScript que ignore el hecho de que button no se inicializa en el constructor, porque 
     //garantizas que será asignado antes de su uso.
@@ -133,7 +133,7 @@ class ApplicationConfigurator {
         }
 
         // Se crea la aplicación y se pasa la fábrica seleccionada.
-        const app = new Application(factory);
+        const app = new Applic(factory);
         app.createUI(); // Se crea la interfaz de usuario.
         app.paint(); // Se "pintan" (renderizan) los componentes gráficos.
     }
