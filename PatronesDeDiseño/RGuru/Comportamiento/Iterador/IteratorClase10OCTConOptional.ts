@@ -1,3 +1,5 @@
+import { Optional } from "../../../Optional";  // Importamos la clase Optional creada anteriormente.
+
 /**
  * Interface Iterador<T> define los métodos necesarios para recorrer una colección.
  * Esta interfaz sigue el patrón Iterator, el cual permite recorrer una colección
@@ -6,9 +8,9 @@
 interface Iterador<T> {
     /**
      * Método que devuelve el siguiente elemento en la colección.
-     * Si no hay más elementos, retorna `null`.
+     * Si no hay más elementos, retorna `Optional.empty()`.
      */
-    next(): T | null;
+    next(): Optional<T>;
 
     /**
      * Método que verifica si hay más elementos en la colección.
@@ -20,13 +22,13 @@ interface Iterador<T> {
 /**
  * La clase ListNode<T> representa un nodo de una lista enlazada.
  * Cada nodo contiene un valor `data` y una referencia (`next`) al siguiente nodo en la lista.
- * Si `next` es `null`, significa que este es el último nodo de la lista.
+ * Si `next` es un `Optional.empty()`, significa que este es el último nodo de la lista.
  */
 class ListNode<T> {
 
     constructor(
-        public next: ListNode<T> | null,  // Puntero al siguiente nodo, si es `null`, es el último nodo.
-        public data: T                    // El valor que contiene este nodo.
+        public next: Optional<ListNode<T>>,  // Usamos Optional para evitar valores `null`.
+        public data: T                       // El valor que contiene este nodo.
     ) {}
 }
 
@@ -41,33 +43,32 @@ class ListIterator<T> implements Iterador<T> {
      * el iterador avanza al siguiente nodo.
      */
     constructor(
-        private root: ListNode<T> | null  // Referencia al nodo actual, empieza siendo la raíz de la lista.
+        private root: Optional<ListNode<T>>  // Usamos Optional para evitar valores `null`.
     ){}
 
     /**
      * Método `next()`:
      * Si hay más nodos en la lista (verificado con `hasNext()`), devuelve el valor del nodo actual
      * y avanza al siguiente nodo.
-     * Si no hay más nodos, devuelve `null`.
+     * Si no hay más nodos, devuelve `Optional.empty()`.
      */
-    next(): T | null {
-        let data: T;
-        if (this.hasNext()) {  // Si hay un nodo actual, es decir, si no es `null`.
-            data = this.root!.data;  // Obtiene el valor actual del nodo (usando `!` porque está garantizado que no es `null`).
-            this.root = this.root!.next;  // Avanza al siguiente nodo en la lista.
-            return data;  // Retorna el valor del nodo actual.
+    next(): Optional<T> {
+        if (this.hasNext()) {  // Si hay un nodo actual.
+            const data = this.root.getValue().data;  // Obtiene el valor del nodo actual.
+            this.root = this.root.getValue().next;  // Avanza al siguiente nodo en la lista.
+            return new Optional<T>(data);  // Retorna el valor del nodo actual envuelto en `Optional`.
         } else {
-            return null;  // Si no hay más nodos, retorna `null`.
+            return new Optional<T>();  // Si no hay más nodos, retorna `Optional.empty()`.
         }
     }
 
     /**
      * Método `hasNext()`:
-     * Verifica si hay más nodos en la lista (si el nodo actual no es `null`).
-     * Si `root` no es `null`, significa que aún hay nodos por recorrer.
+     * Verifica si hay más nodos en la lista (si el nodo actual no es un `Optional.empty()`).
+     * Si `root` no es un `Optional.empty()`, significa que aún hay nodos por recorrer.
      */
     hasNext(): boolean {
-        return this.root !== null;  // Si `root` no es `null`, hay más elementos.
+        return this.root.hasValue();  // Si `root` tiene un valor, hay más elementos.
     }
 }
 
@@ -83,21 +84,21 @@ class ListAggregate<T> {
      * Devuelve una nueva instancia del iterador `ListIterator`, inicializado con el nodo raíz de la lista.
      */
     getListIterator(): ListIterator<T> {
-        return new ListIterator(this.rootList);  // Crea un nuevo iterador para la lista.
+        return new ListIterator(new Optional(this.rootList));  // Crea un nuevo iterador para la lista.
     }
 }
 
 // Probemos el código:
 
 // Creación de una lista enlazada de nodos.
-// El nodo `node1` tiene valor 10 y es el último nodo, por lo que `next` es `null`.
-const node1 = new ListNode(null, 10);
+// El nodo `node1` tiene valor 10 y es el último nodo, por lo que `next` es `Optional.empty()`.
+const node1 = new ListNode(new Optional<ListNode<number>>(), 10);
 
 // El nodo `node2` tiene valor 5 y su siguiente nodo es `node1`.
-const node2 = new ListNode(node1, 5);
+const node2 = new ListNode(new Optional(node1), 5);
 
 // El nodo `lista` es el nodo raíz y tiene valor 15, y su siguiente nodo es `node2`.
-const lista = new ListNode(node2, 15);
+const lista = new ListNode(new Optional(node2), 15);
 
 // Creamos una instancia de ListAggregate con el nodo raíz `lista`.
 const aggregate = new ListAggregate(lista);
@@ -107,10 +108,10 @@ const iterador = aggregate.getListIterator();
 
 // Recorremos la lista usando el iterador.
 // El método `next()` devuelve el valor del nodo actual y avanza al siguiente nodo.
-console.log(iterador.next());  // Devuelve 15 (el valor del nodo raíz).
-console.log(iterador.next());  // Devuelve 5 (el valor del segundo nodo).
-console.log(iterador.next());  // Devuelve 10 (el valor del último nodo).
-console.log(iterador.next());  // Devuelve `null` porque ya no hay más nodos.
+console.log(iterador.next().getValue());  // Devuelve 15 (el valor del nodo raíz).
+console.log(iterador.next().getValue());  // Devuelve 5 (el valor del segundo nodo).
+console.log(iterador.next().getValue());  // Devuelve 10 (el valor del último nodo).
+console.log(iterador.next().hasValue());  // Devuelve `false` porque ya no hay más nodos.
 
 // Verificamos si hay más nodos usando `hasNext()`:
 if (!iterador.hasNext()) {
