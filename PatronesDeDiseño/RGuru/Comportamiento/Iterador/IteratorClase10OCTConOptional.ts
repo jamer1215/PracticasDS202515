@@ -5,7 +5,7 @@ import { Optional } from "../../../Optional";  // Importamos la clase Optional c
  * Esta interfaz sigue el patrón Iterator, el cual permite recorrer una colección
  * de elementos sin exponer su estructura interna.
  */
-interface Iterador<T> {
+ export interface Iterador<T> {
     /**
      * Método que devuelve el siguiente elemento en la colección.
      * Si no hay más elementos, retorna `Optional.empty()`.
@@ -17,6 +17,10 @@ interface Iterador<T> {
      * Devuelve `true` si hay más elementos, de lo contrario `false`.
      */
     hasNext(): boolean;
+}
+
+export interface Aggregate<T>{
+    getIterator():Iterador<T>
 }
 
 /**
@@ -76,14 +80,14 @@ class ListIterator<T> implements Iterador<T> {
  * La clase ListAggregate<T> es un agregado que almacena una lista enlazada
  * y proporciona un método para obtener un iterador que recorrerá esa lista.
  */
-class ListAggregate<T> {
+class ListAggregate<T> implements Aggregate<T>{
     constructor(private rootList: ListNode<T>) {}
 
     /**
      * Método `getListIterator()`:
      * Devuelve una nueva instancia del iterador `ListIterator`, inicializado con el nodo raíz de la lista.
      */
-    getListIterator(): ListIterator<T> {
+    getIterator(): ListIterator<T> {
         return new ListIterator(new Optional(this.rootList));  // Crea un nuevo iterador para la lista.
     }
 }
@@ -104,7 +108,7 @@ const lista = new ListNode(new Optional(node2), 15);
 const aggregate = new ListAggregate(lista);
 
 // Obtenemos un iterador para recorrer la lista.
-const iterador = aggregate.getListIterator();
+const iterador = aggregate.getIterator();
 
 // Recorremos la lista usando el iterador.
 // El método `next()` devuelve el valor del nodo actual y avanza al siguiente nodo.

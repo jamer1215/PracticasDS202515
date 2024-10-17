@@ -102,15 +102,15 @@ class ConcreteClass2 extends AbstractClass {
  * El código cliente no necesita conocer la clase concreta del objeto con el que trabaja,
  * siempre que funcione a través de la interfaz de la clase base.
  */
-function clientCode(abstractClass: AbstractClass) {
+function clientCodeTM(abstractClass: AbstractClass) {
     // ...
     abstractClass.templateMethod();  // Se llama al método plantilla, ejecutando el algoritmo.
     // ...
 }
 
 console.log('El mismo código cliente puede trabajar con diferentes subclases:');
-clientCode(new ConcreteClass1());  // Usando ConcreteClass1.
+clientCodeTM(new ConcreteClass1());  // Usando ConcreteClass1.
 console.log('');
 
 console.log('El mismo código cliente puede trabajar con diferentes subclases:');
-clientCode(new ConcreteClass2());  // Usando ConcreteClass2.
+clientCodeTM(new ConcreteClass2());  // Usando ConcreteClass2.

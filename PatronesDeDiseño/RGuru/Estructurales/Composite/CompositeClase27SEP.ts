@@ -2,6 +2,7 @@
 //DUDA 0: en refactoring guru definen esto como una clase abstracta... cuando se cual me conviene?
 interface Componente{
     calcularPrecio():number;
+    isComposite():boolean;
 }
 
 // DUDA 4: Es necesario contemplar lo de establecer quien es papá de quien?

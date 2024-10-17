@@ -73,32 +73,32 @@ class FacebookNotifierDecorator extends NotifierDecorator {
 }
 
 // Código del cliente que utiliza el patrón Decorator para enviar notificaciones por varios canales.
-function clientCode(notifier: Notifier) {
+function clientCodeNo(notifier: Notifier) {
     notifier.send('Hello, this is a notification!');
 }
 
 // Escenario 1: Uso del Notificador simple (solo por email).
 console.log('--- Email Notifier ---');
 const emailNotifier = new EmailNotifier();
-clientCode(emailNotifier);
+clientCodeNo(emailNotifier);
 
 console.log('\n');
 
 // Escenario 2: Agregando la funcionalidad de SMS usando el decorador.
 console.log('--- Email + SMS Notifier ---');
 const smsNotifier = new SMSNotifierDecorator(emailNotifier);
-clientCode(smsNotifier);
+clientCodeNo(smsNotifier);
 
 console.log('\n');
 
 // Escenario 3: Agregando la funcionalidad de Slack encima del SMS y Email.
 console.log('--- Email + SMS + Slack Notifier ---');
 const slackNotifier = new SlackNotifierDecorator(smsNotifier);
-clientCode(slackNotifier);
+clientCodeNo(slackNotifier);
 
 console.log('\n');
 
 // Escenario 4: Agregando también la funcionalidad de Facebook.
 console.log('--- Email + SMS + Slack + Facebook Notifier ---');
 const facebookNotifier = new FacebookNotifierDecorator(slackNotifier);
-clientCode(facebookNotifier);
+clientCodeNo(facebookNotifier);

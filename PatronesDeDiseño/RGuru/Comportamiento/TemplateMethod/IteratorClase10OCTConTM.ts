@@ -79,16 +79,15 @@ class ListIterator<T> implements Iterador<T> {
 //Como la tarea se basa en que getListIterator tenga aplicabilidad del patron Template Method
 //La declararé como abstracta
 abstract class ListAggregate<T> {
-    constructor(protected rootList: ListNode<T>) {}
 
     /**
      * Método `getListIterator()`:
      * Devuelve una nueva instancia del iterador `ListIterator`, inicializado con el nodo raíz de la lista.
      */
     //Este sería el método plantilla (Template Method)
-    // * Define el proceso general para obtener un iterador.
-    //  * Este método no se modifica, pero las subclases pueden definir qué tipo de iterador devolver
-    //  * a través del método `createIterator()`.
+    //  Define el proceso general para obtener un iterador.
+    //   Este método no se modifica, pero las subclases pueden definir qué tipo de iterador devolver
+    //   a través del método `createIterator()`.
     getAnIterator(): Iterador<T> {
         return this.createIterator();  // Delegamos a la subclase la creación del iterador.
     }
@@ -99,6 +98,12 @@ abstract class ListAggregate<T> {
 //Ahora, hagamos clases concretas que implementan el algoritmo pertinente a la del getListIterator
 //además de que tiene su propia implementación para crear iteradores (basemonos en el ejemplo de la clase)
 class ConcreteListAggregate<T> extends ListAggregate<T> {
+
+    constructor(private rootList: ListNode<T>){
+        super();
+    }
+
+ 
 
     /**
      * Implementación concreta del método `createIterator()`, que devuelve un `ListIterator`.

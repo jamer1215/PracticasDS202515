@@ -114,7 +114,7 @@ class YouTubeManager {
 }
 
 // Clase principal que inicializa la aplicación.
-class Application {
+class ApplicationProxy {
     init(): void {
         const aYouTubeService = new ThirdPartyYouTubeClass(); // Servicio original
         const aYouTubeProxy = new CachedYouTubeClass(aYouTubeService); // Proxy con caché
@@ -124,5 +124,5 @@ class Application {
 }
 
 // Crear una instancia de la aplicación e iniciarla.
-const app = new Application();
-app.init();
+const appProxy = new ApplicationProxy();
+appProxy.init();
