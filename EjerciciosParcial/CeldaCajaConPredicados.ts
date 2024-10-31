@@ -1,3 +1,5 @@
+import { Optional } from "../PatronesDeDiseño/Optional";
+
 class Celda2 <T>{
 
     constructor(public valor: T){
@@ -6,18 +8,18 @@ class Celda2 <T>{
 
     }
 
-    public reducir (f:(e1:T,e2:T)=>T, predicado:(e:T)=>boolean):T{
+    public reducir (f:(e1:T,e2:T)=>T, predicado:(e:T)=>boolean):Optional<T>{
 
         //esto está mal programado a nivel de lógica
         //si cumple con el predicado el return es this.valor (sin aplicarle f)
         //con el uso de optional contemplo el caso en el que no cumpla con el predicado para no retornar nada
 
-        let operacion=this.valor;//inicializo una variable igual al atributo valor
+        let operacion:Optional<T>=new Optional();//inicializo la vaina en null
 
-        //si no cumple el predicado, operacion se limita a devolver al valor inicializado anteriormente - this.valor
+        //si cumple el predicado devuelve la vaina con valor
         if (predicado(this.valor)){
-           operacion = f(this.valor,this.valor) //return debería ser this.valor sin aplicarle f
-        }
+           operacion = new Optional(this.valor) //segun lo visto en clase es solo devolver el valor
+        }//no entrar al if=no cumple predicado y operacion queda nullo
 
         return operacion;
     }
@@ -37,30 +39,28 @@ class Caja2<T> extends Celda2<T>{
     }
 
     //lo jodido
-    public reducir (f:(e1:T,e2:T)=>T, predicado:(e:T)=>boolean):T{
-        let valor: T = this.valor;//declaramos una variable que almacene el valor que tiene la caja
-        let suma: T = this.elementos[0].valor;//inicializamos con el valor de la primera celda.
+    public reducir (f:(e1:T,e2:T)=>T, predicado:(e:T)=>boolean):Optional<T>{
+        // Inicializamos un Optional vacío para el resultado
+        let resultado: Optional<T> = new Optional<T>();
         let elemento: Celda2<T>;
          
-       
-            //tengo que corregir esto
+            //creo que esta vez si me fume una buena lumpia
             for(elemento of this.elementos){//elemento es la variable que se asigna a cada elemento en cada iteracion y elementos es lo iterable
-                //el predicado lo tiene que cumplir el valor con f aplicado, no f en sí (CREOOOO)
-                if(predicado(elemento.valor) && predicado(valor)){//tengo que validar que valor de caja cumpla?
-                    console.log("Valor de la variable valor antes de f = ",valor)
-                    console.log("Elemento en la iteracion antes de f es:",elemento)//por control
-                    console.log("Elemento.reducir despues de f:",elemento.reducir(f,predicado))//por control
-                    //lo verdaderamente primordial
-                    suma = f(valor, elemento.reducir(f,predicado))
-                    console.log("Valor de la variable valor despues de f = ",valor)
-                    console.log("Valor de suma despues de f:",suma)//por control
-                    console.log("Elemento.reducir despues de f:",elemento.reducir(f,predicado))//por control
+                let valorReducido = elemento.reducir(f, predicado); // Reducimos cada elemento presente en caja (celdas)
+                if(valorReducido.hasValue() && predicado(this.valor)){//si la operacion reducir en celda retorna un valor y el valor de esta caja cumple con el predicado
+                    // Si el valor reducido está presente y el valor de la caja también cumple el predicado
+                    if (!resultado.hasValue()) {
+                    resultado = new Optional(this.valor); // Inicializamos el resultado con el valor de la caja
+                    }else{
+                    // Aplicamos la función de reducción f con el valor reducido
+                    resultado = new Optional(f(resultado.getValue(), valorReducido.getValue()));
+                    }
                 }
 
             }
 
 
-      return suma;//si no entra en el if entonces retornará el valor de la var. valor en esa iteración
+      return resultado;//si no entra en el if entonces retornará el valor de la var. valor en esa iteración
     }
 
 }

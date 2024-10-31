@@ -124,7 +124,7 @@ class ProductoConcretoB2 implements ProductoAbstractoB {
  * abstractos: FabricaAbstracta, ProductoAbstractoA y ProductoAbstractoB. Esto te
  * permite pasar cualquier subclase de fábrica o producto al código cliente sin romperlo.
  */
-function codigoCliente(fabrica: FabricaAbstracta) {
+function codigoClienteAF(fabrica: FabricaAbstracta) {
     // Se crea el producto A y el producto B usando la fábrica concreta proporcionada.
     const productoA = fabrica.crearProductoA();
     const productoB = fabrica.crearProductoB();
@@ -139,9 +139,9 @@ function codigoCliente(fabrica: FabricaAbstracta) {
  * El código cliente puede trabajar con cualquier clase de fábrica concreta.
  */
 console.log('Cliente: Probando el código cliente con el primer tipo de fábrica...');
-codigoCliente(new FabricaConcreta1());
+codigoClienteAF(new FabricaConcreta1());
 
 console.log('');
 
 console.log('Cliente: Probando el mismo código cliente con el segundo tipo de fábrica...');
-codigoCliente(new FabricaConcreta2());
+codigoClienteAF(new FabricaConcreta2());

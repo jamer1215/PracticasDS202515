@@ -77,7 +77,7 @@ class HTMLButton implements Button {
 }
 
 // Clase principal que gestiona la aplicación.
-class Application {
+class ApplicationFM {
     private dialog!: Dialog;//estoy asegurándome de que dialog va a ser instanciado en algun puntoooo
 
     // Este método elige el tipo de creador (fábrica) dependiendo del entorno.
@@ -101,5 +101,5 @@ class Application {
 }
 
 // Ejecución de la aplicación
-const app = new Application();
-app.main();
+let appFM = new ApplicationFM ();
+appFM.main();

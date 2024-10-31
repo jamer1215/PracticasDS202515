@@ -37,5 +37,6 @@ class BotonRedondo implements Boton {
 }
 
 // Uso de la subclase personalizada en lugar del framework base
-const miAppUI = new UIConBotonesRedondos();
+let miAppUI = new UIConBotonesRedondos();
 miAppUI.renderUI();  // Esto creará y renderizará un botón redondo
+

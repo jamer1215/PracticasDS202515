@@ -1,34 +1,40 @@
-// Definimos la clase AudioPlayer que actúa como el contexto. Esta clase gestiona el estado del reproductor y delega
-// las acciones a los diferentes estados a través de los métodos como clickPlay(), clickLock(), etc.
-class AudioPlayer {
-    // El campo 'state' es el que mantiene el estado actual del reproductor. Es de tipo 'State', que es la clase abstracta de estado.
-    private state: State;
-    
-    // Algunos campos adicionales como UI, volume, playlist, y currentSong para manejar la interfaz y los datos del reproductor.
-    private UI: any;
-    private volume: number;
-    private playlist: string[];
-    private currentSong: string;
+// La clase AudioPlayerEst actúa como un contexto que mantiene una referencia al estado actual del reproductor.
+// Este contexto delega las acciones a su estado actual, permitiendo que el comportamiento cambie dinámicamente
+// en función del estado en el que se encuentre el reproductor.
+class AudioPlayerEst {
+    public state: StateEst; // Estado actual del reproductor de audio
+    public UI: UserInterfaceEst; // Simulación de la interfaz de usuario del reproductor
+    public volume: number; // Volumen actual del reproductor
+    public playlist: string[]; // Lista de reproducción con las canciones
+    public currentSong: number; // Índice de la canción que se está reproduciendo actualmente
 
     constructor() {
-        // Inicialmente, el estado del reproductor es 'ReadyState', indicando que está listo para reproducir música.
-        this.state = new ReadyStatee(this);
+        // Asegurarse de que el reproductor comience en el estado Ready (listo para reproducir)
+        this.state = new ReadyStatePlayerEst(this); // Estado inicial configurado correctamente
+        this.volume = 50; // Se establece un volumen inicial
+        this.playlist = ["Canción 1", "Canción 2", "Canción 3"]; // Lista de canciones de ejemplo
+        this.currentSong = 0; // La primera canción de la lista es la que se selecciona inicialmente
 
-        // Aquí se simula una interfaz de usuario (UI). Asignamos los métodos click a los botones de la UI.
-        this.UI = {
-            lockButton: { onClick: this.clickLock.bind(this) },
-            playButton: { onClick: this.clickPlay.bind(this) },
-            nextButton: { onClick: this.clickNext.bind(this) },
-            prevButton: { onClick: this.clickPrevious.bind(this) }
-        };
+        // Configuración de la interfaz de usuario y sus eventos
+        // Se crean botones para simular la interfaz del reproductor
+        this.UI = new UserInterfaceEst();
+        // this.UI.lockButton.onClick(() => this.clickLock());
+        //mosca con lo comentado anterior, cuando instancio la vaina inicia clickeando para bloquear entonces aja
+        //como hago para que se cambie en tiempo de ejecucion? NOTA: OK LISTO ENTENDI JEJEJE
+        this.UI.playButton.onClick(() => this.clickPlay());
+        this.UI.nextButton.onClick(() => this.clickNext());
+        this.UI.prevButton.onClick(() => this.clickPrevious());
+
+        console.log("Estado inicial: ReadyStatePlayerEst"); // Mensaje para verificar el estado inicial
     }
 
-    // Este método permite cambiar el estado del reproductor, es decir, actualizar el objeto 'state'.
-    public changeState(state: State): void {
+    // Cambia el estado actual del reproductor a otro estado
+    public changeState(state: StateEst): void {
         this.state = state;
     }
 
-    // Métodos que delegan la funcionalidad al estado actual del reproductor.
+    // Métodos que delegan la ejecución al estado actual.
+    // Cada método simplemente llama al método correspondiente en el objeto de estado actual.
     public clickLock(): void {
         this.state.clickLock();
     }
@@ -45,151 +51,173 @@ class AudioPlayer {
         this.state.clickPrevious();
     }
 
-    // Métodos de servicio del reproductor. Estos serán invocados por los estados concretos cuando se requiera.
+    // Métodos adicionales que pueden ser llamados por los estados para controlar el reproductor.
     public startPlayback(): void {
-        console.log("Starting playback");
+        console.log("Reproducción iniciada: " + this.playlist[this.currentSong]);
     }
 
     public stopPlayback(): void {
-        console.log("Stopping playback");
+        console.log("Reproducción detenida.");
     }
 
     public nextSong(): void {
-        console.log("Next song");
+        // Cambia a la siguiente canción en la lista de reproducción.
+        this.currentSong = (this.currentSong + 1) % this.playlist.length;
+        console.log("Siguiente canción: " + this.playlist[this.currentSong]);
     }
 
     public previousSong(): void {
-        console.log("Previous song");
+        // Cambia a la canción anterior en la lista de reproducción.
+        this.currentSong = (this.currentSong - 1 + this.playlist.length) % this.playlist.length;
+        console.log("Canción anterior: " + this.playlist[this.currentSong]);
     }
 
     public fastForward(time: number): void {
-        console.log(`Fast forwarding ${time} seconds`);
+        console.log(`Avance rápido de ${time} segundos.`);
     }
 
     public rewind(time: number): void {
-        console.log(`Rewinding ${time} seconds`);
+        console.log(`Rebobinado de ${time} segundos.`);
     }
 }
 
-// Clase abstracta State. Define los métodos que deben ser implementados por las subclases concretas de estado.
-// También tiene una referencia al contexto (AudioPlayer) que permite que los estados interactúen con el reproductor.
-abstract class State {
-    protected player: AudioPlayer;
+// La clase abstracta StateEst define la interfaz común para todos los estados del reproductor.
+// Proporciona una referencia al objeto AudioPlayerEst (contexto) para permitir a los estados
+// cambiar el estado actual del reproductor.
+abstract class StateEst {
+    protected player: AudioPlayerEst; // Referencia al contexto
 
-    // Constructor que recibe el reproductor como argumento.
-    constructor(player: AudioPlayer) {
+    // El constructor recibe el contexto y lo guarda en una propiedad
+    constructor(player: AudioPlayerEst) {
         this.player = player;
     }
 
-    // Métodos abstractos que deben ser implementados por las clases concretas.
+    // Métodos abstractos que cada estado concreto deberá implementar
     abstract clickLock(): void;
     abstract clickPlay(): void;
     abstract clickNext(): void;
     abstract clickPrevious(): void;
 }
 
-// Estado concreto: LockedState. Este estado representa cuando el reproductor está bloqueado.
-// En este estado, no se pueden usar las funciones de reproducción, avanzar o retroceder.
-class LockedState extends State {
-    
-    // Al hacer clic en el botón de bloqueo, si el reproductor está reproduciendo, cambia a "PlayingState".
-    // Si no está reproduciendo, cambia a "ReadyState".
+// La clase LockedStateEst representa el estado en el que el reproductor está bloqueado.
+// En este estado, todas las acciones del usuario son ignoradas excepto el desbloqueo.
+class LockedStateEst extends StateEst {
     public clickLock(): void {
-        if (this.player.startPlayback()) {
-            this.player.changeState(new PlayingState(this.player));
+        // Si el reproductor está bloqueado y se hace clic en el botón de bloqueo,
+        // el reproductor cambia a estado Ready o Playing dependiendo de si está reproduciendo una canción.
+        if (this.player.currentSong >= 0) {
+            console.log("Desbloqueando y cambiando a estado Playing.");
+            this.player.changeState(new PlayingStateEst(this.player)); // Cambia a Playing
         } else {
-            this.player.changeState(new ReadyStatee(this.player));
+            console.log("Desbloqueando y cambiando a estado Ready.");
+            this.player.changeState(new ReadyStatePlayerEst(this.player)); // Cambia a Ready
         }
     }
 
-    // En el estado bloqueado, no se permite ninguna otra interacción.
     public clickPlay(): void {
-        // Bloqueado, no hace nada.
+        // No se puede reproducir cuando el reproductor está bloqueado
+        console.log("El reproductor está bloqueado, no se puede reproducir.");
     }
 
     public clickNext(): void {
-        // Bloqueado, no hace nada.
+        // No se puede avanzar a la siguiente canción cuando está bloqueado
+        console.log("El reproductor está bloqueado, no se puede avanzar.");
     }
 
     public clickPrevious(): void {
-        // Bloqueado, no hace nada.
+        // No se puede retroceder a la canción anterior cuando está bloqueado
+        console.log("El reproductor está bloqueado, no se puede retroceder.");
     }
 }
 
-// Estado concreto: ReadyState. Representa cuando el reproductor está listo para reproducir música.
-// En este estado, las acciones como avanzar o retroceder entre canciones están habilitadas.
-class ReadyStatee extends State {
-
-    // Al hacer clic en el botón de bloqueo, cambia al estado bloqueado.
+// La clase ReadyStatePlayerEst representa el estado en el que el reproductor está listo para comenzar a reproducir.
+class ReadyStatePlayerEst extends StateEst {
     public clickLock(): void {
-        this.player.changeState(new LockedState(this.player));
+        // Al hacer clic en el botón de bloqueo, el reproductor cambia a estado Locked
+        this.player.changeState(new LockedStateEst(this.player));
+        console.log("Reproductor bloqueado.");
     }
 
-    // Al hacer clic en el botón de reproducción, comienza a reproducir música y cambia al estado "PlayingState".
     public clickPlay(): void {
+        // Al hacer clic en el botón de reproducción, comienza la reproducción y cambia a Playing
         this.player.startPlayback();
-        this.player.changeState(new PlayingState(this.player));
+        this.player.changeState(new PlayingStateEst(this.player));
     }
 
-    // Al hacer clic en el botón de "siguiente", se avanza a la siguiente canción.
     public clickNext(): void {
+        // En estado Ready, se puede avanzar a la siguiente canción
         this.player.nextSong();
     }
 
-    // Al hacer clic en el botón de "anterior", se retrocede a la canción anterior.
     public clickPrevious(): void {
+        // En estado Ready, se puede retroceder a la canción anterior
         this.player.previousSong();
     }
 }
 
-// Estado concreto: PlayingState. Representa cuando el reproductor está reproduciendo música.
-// En este estado, puedes pausar la reproducción, avanzar rápidamente, o retroceder.
-class PlayingState extends State {
-
-    // Al hacer clic en el botón de bloqueo, cambia al estado bloqueado.
+// La clase PlayingStateEst representa el estado en el que el reproductor está reproduciendo una canción.
+class PlayingStateEst extends StateEst {
     public clickLock(): void {
-        this.player.changeState(new LockedState(this.player));
+        // Al hacer clic en el botón de bloqueo, el reproductor se bloquea
+        this.player.changeState(new LockedStateEst(this.player));
+        console.log("Reproductor bloqueado.");
     }
 
-    // Al hacer clic en el botón de reproducción, detiene la música y cambia al estado "ReadyState".
     public clickPlay(): void {
+        // Al hacer clic en el botón de reproducción mientras está en Playing, se detiene la reproducción y cambia a Ready
         this.player.stopPlayback();
-        this.player.changeState(new ReadyStatee(this.player));
+        this.player.changeState(new ReadyStatePlayerEst(this.player));
     }
 
-    // Si es un doble clic, avanza a la siguiente canción; si no, hace un avance rápido de 5 segundos.
     public clickNext(): void {
-        if (this.isDoubleClick()) {
-            this.player.nextSong();
-        } else {
-            this.player.fastForward(5);
-        }
+        // En Playing, al hacer clic en el botón de siguiente, se cambia a la siguiente canción
+        console.log("Avanzando a la siguiente canción.");
+        this.player.nextSong();
     }
 
-    // Si es un doble clic, retrocede a la canción anterior; si no, rebobina 5 segundos.
     public clickPrevious(): void {
-        if (this.isDoubleClick()) {
-            this.player.previousSong();
-        } else {
-            this.player.rewind(5);
-        }
-    }
-
-    // Método auxiliar que simula la detección de un doble clic.
-    private isDoubleClick(): boolean {
-        // Aquí podrías agregar lógica real para detectar un doble clic.
-        return Math.random() > 0.5;
+        // En Playing, al hacer clic en el botón de anterior, se cambia a la canción anterior
+        console.log("Retrocediendo a la canción anterior.");
+        this.player.previousSong();
     }
 }
 
-// Ejemplo de uso:
+// La clase UserInterfaceEst simula la interfaz de usuario para el reproductor de audio.
+// Cada botón tiene un método onClick para simular la interacción del usuario.
+class UserInterfaceEst {
+    public lockButton: ButtonEst = new ButtonEst(); // Botón para bloquear/desbloquear
+    public playButton: ButtonEst = new ButtonEst(); // Botón para reproducir/detener
+    public nextButton: ButtonEst = new ButtonEst(); // Botón para avanzar a la siguiente canción
+    public prevButton: ButtonEst = new ButtonEst(); // Botón para retroceder a la canción anterior
+}
 
-const player = new AudioPlayer();
+// La clase ButtonEst simula un botón de la interfaz gráfica de usuario.
+// El método onClick recibe una función callback que se ejecuta al simular el clic en el botón.
+class ButtonEst {
+    public onClick(callback: () => void): void {
+        // En una implementación real, esto registraría el callback para cuando el botón sea presionado.
+        callback(); // Llamada simulada al callback.
+    }
+}
 
-// Simulamos algunas acciones en el reproductor:
-player.clickPlay();     // Inicia la reproducción.
-player.clickNext();     // Avanza a la siguiente canción o avanza 5 segundos.
-player.clickLock();     // Bloquea el reproductor.
-player.clickPlay();     // Intenta reproducir, pero está bloqueado.
-player.clickLock();     // Desbloquea el reproductor.
-player.clickPlay();     // Detiene la reproducción.
+// Código para simular el uso del reproductor de audio
+const playerEst = new AudioPlayerEst();
+
+console.log("=== Caso de Prueba 1: Reproducción de Audio ===");
+playerEst.clickPlay(); // Inicia la reproducción
+
+console.log("\n=== Caso de Prueba 2: Avanzar a la Siguiente Canción ===");
+playerEst.clickNext(); // Cambia a la siguiente canción
+
+console.log("\n=== Caso de Prueba 3: Pausar y Volver a Estado Ready ===");
+playerEst.clickPlay(); // Pausa la reproducción
+
+console.log("\n=== Caso de Prueba 4: Bloquear el Reproductor ===");
+playerEst.clickLock(); // Bloquea el reproductor
+
+console.log("\n=== Caso de Prueba 5: Intentar Reproducir en Estado Bloqueado ===");
+playerEst.clickPlay(); // No hace nada, ya que está bloqueado
+
+console.log("\n=== Caso de Prueba 6 JMA: Presionemos el boton lock pa ver qlq ===");
+playerEst.clickLock(); // Bloquea el reproductor
+

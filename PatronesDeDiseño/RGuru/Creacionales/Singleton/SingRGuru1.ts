@@ -1,8 +1,12 @@
 // La clase Database define el método `getInstance` que permite a los clientes
+
+import { Optional } from "../../../Optional";
+
+// La clase DatabaseSin define el método `getInstance` que permite a los clientes
 // acceder a la misma instancia de una conexión de la base de datos en todo el programa.
-class Database {
+class DatabaseSin {
     // El campo para almacenar la instancia singleton debe ser estático.
-    private static instance: Database | null = null;
+    private static instance: Optional<DatabaseSin> = new Optional();
 
     // El constructor del singleton es privado para evitar la creación directa de instancias
     // usando el operador `new`.
@@ -13,18 +17,14 @@ class Database {
     }
 
     // El método estático que controla el acceso a la instancia del singleton.
-    public static getInstance(): Database {
+    public static getInstance(): DatabaseSin {
         // Si la instancia no ha sido creada aún, la creamos.
-        if (Database.instance === null) {
-            // Utilizamos bloqueo para evitar problemas en un entorno multihilo.
-            // En TypeScript, esto es solo conceptual, ya que no existe el soporte
-            // directo para hilos. Es importante entender la intención.
-            if (Database.instance === null) {
-                Database.instance = new Database();
-            }
+        if (!DatabaseSin.instance.hasValue()) {
+            // Establecemos la instancia del Singleton en el Optional.
+            DatabaseSin.instance=new Optional(new DatabaseSin());
         }
         // Devolvemos la instancia ya creada.
-        return Database.instance;
+        return DatabaseSin.instance.getValue();
     }
 
     // Método que representa la lógica de negocio que puede ejecutarse en la instancia.
@@ -36,15 +36,15 @@ class Database {
     }
 }
 
-// Ejemplo de uso de la clase Database.
-class ApplicationS {
+// Ejemplo de uso de la clase DatabaseSin.
+class ApplicationSin {
     public static main(): void {
         // Obtiene la instancia de la base de datos y ejecuta una consulta.
-        const foo = Database.getInstance();
+        const foo = DatabaseSin.getInstance();
         foo.query("SELECT * FROM users");
 
         // Obtiene la misma instancia de la base de datos y ejecuta otra consulta.
-        const bar = Database.getInstance();
+        const bar = DatabaseSin.getInstance();
         bar.query("SELECT * FROM orders");
 
         // `foo` y `bar` contienen la misma instancia.
@@ -53,4 +53,4 @@ class ApplicationS {
 }
 
 // Llamamos al método main para probar el código.
-ApplicationS.main();
+ApplicationSin.main();

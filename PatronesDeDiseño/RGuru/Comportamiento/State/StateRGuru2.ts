@@ -1,103 +1,92 @@
 /**
- * El Contexto define la interfaz de interés para los clientes. 
- * También mantiene una referencia a una instancia de una subclase de Estado, 
- * que representa el estado actual del Contexto.
+ * El Contexto define la interfaz de interés para los clientes. También mantiene una
+ * referencia a una instancia de una subclase de Estado, que representa el estado actual
+ * del Contexto.
  */
 class Context {
     /**
      * @type {State} Una referencia al estado actual del Contexto.
      */
-    private state?: Estado; // Aquí almacenamos el estado actual. Se hace opcional.
+    private state!: State; // Usamos el operador de afirmación no nula para indicar que 'state' se inicializará en el constructor.
 
-    constructor(state: Estado) {
-        this.transitionTo(state); // Al crear el contexto, lo inicializamos con un estado.
+    constructor(state: State) {
+        // Inicializa el contexto con un estado dado y realiza la transición al mismo.
+        this.transitionTo(state);
     }
 
     /**
-     * El Contexto permite cambiar el objeto State en tiempo de ejecución.
+     * El Contexto permite cambiar el objeto Estado en tiempo de ejecución.
      */
-    public transitionTo(state: Estado): void {
-        console.log(`Contexto: Transición a ${(<any>state).constructor.name}.`); // Mostramos en consola la transición.
-        this.state = state; // Actualizamos el estado actual del contexto.
-        this.state.setContext(this); // Notificamos al nuevo estado sobre el contexto actual.
+    public transitionTo(state: State): void {
+        // Informa sobre la transición al nuevo estado.
+        console.log(`Contexto: Transición a ${(<any>state).constructor.name}.`);
+        this.state = state; // Cambia al nuevo estado.
+        this.state.setContext(this); // Establece el contexto en el nuevo estado.
     }
 
     /**
-     * El Contexto delega parte de su comportamiento al objeto State actual.
+     * El Contexto delega parte de su comportamiento al objeto Estado actual.
      */
     public request1(): void {
-        this.state?.handle1(); // Llamamos al método handle1 del estado actual, usando encadenamiento opcional.
+        this.state.handle1(); // Llama al método handle1 del estado actual.
     }
 
     public request2(): void {
-        this.state?.handle2(); // Llamamos al método handle2 del estado actual, usando encadenamiento opcional.
+        this.state.handle2(); // Llama al método handle2 del estado actual.
     }
 }
 
 /**
- * La clase base State declara métodos que todos los estados concretos deben
- * implementar y también proporciona una referencia inversa al objeto Contexto,
- * asociado con el Estado. Esta referencia inversa puede ser utilizada por los
- * estados para transitar el Contexto a otro Estado.
+ * La clase base Estado declara métodos que todos los Estados Concretos deben
+ * implementar y también proporciona una referencia de retorno al objeto Contexto,
+ * asociado con el Estado. Esta referencia puede ser utilizada por los Estados para
+ * transitar el Contexto a otro Estado.
  */
-abstract class Estado {
-    protected context?: Context; // Se hace opcional.
+abstract class State {
+    protected context!: Context; // Usamos el operador de afirmación no nula para indicar que 'context' se inicializará en 'setContext'.
 
     public setContext(context: Context) {
-        this.context = context; // Establecemos el contexto actual.
+        this.context = context; // Establece el contexto para el estado.
     }
 
-    public abstract handle1(): void; // Método abstracto a implementar por los estados concretos.
-    
-    public abstract handle2(): void; // Otro método abstracto a implementar.
+    // Métodos abstractos que los estados concretos deben implementar.
+    public abstract handle1(): void;
+    public abstract handle2(): void;
 }
 
 /**
- * Los Estados Concretos implementan varios comportamientos, 
- * asociados con un estado del Contexto.
+ * Los Estados Concretos implementan varios comportamientos, asociados con un estado del
+ * Contexto.
  */
-class ConcreteStateA extends Estado {
-    clickLock(): void {
-        throw new Error("Method not implemented.");
-    }
-    clickPlay(): void {
-        throw new Error("Method not implemented.");
-    }
-    clickNext(): void {
-        throw new Error("Method not implemented.");
-    }
-    clickPrevious(): void {
-        throw new Error("Method not implemented.");
-    }
+class ConcreteStateA extends State {
     public handle1(): void {
-        console.log('ConcreteStateA maneja request1.'); // Mensaje indicando que el estado A maneja la solicitud 1.
-        console.log('ConcreteStateA quiere cambiar el estado del contexto.'); // Mensaje indicando que quiere cambiar el estado.
-        // Cambiamos el estado del contexto a ConcreteStateB.
-        this.context?.transitionTo(new ConcreteStateB()); 
+        console.log('ConcreteStateA maneja request1.');
+        console.log('ConcreteStateA quiere cambiar el estado del contexto.');
+        // Cambia al estado ConcreteStateB.
+        this.context.transitionTo(new ConcreteStateB());
     }
 
     public handle2(): void {
-        console.log('ConcreteStateA maneja request2.'); // Mensaje indicando que el estado A maneja la solicitud 2.
+        console.log('ConcreteStateA maneja request2.');
     }
 }
 
-class ConcreteStateB extends Estado {
+class ConcreteStateB extends State {
     public handle1(): void {
-        console.log('ConcreteStateB maneja request1.'); // Mensaje indicando que el estado B maneja la solicitud 1.
+        console.log('ConcreteStateB maneja request1.');
     }
 
     public handle2(): void {
-        console.log('ConcreteStateB maneja request2.'); // Mensaje indicando que el estado B maneja la solicitud 2.
-        console.log('ConcreteStateB quiere cambiar el estado del contexto.'); // Mensaje indicando que quiere cambiar el estado.
-        // Cambiamos el estado del contexto a ConcreteStateA.
-        this.context?.transitionTo(new ConcreteStateA()); 
+        console.log('ConcreteStateB maneja request2.');
+        console.log('ConcreteStateB quiere cambiar el estado del contexto.');
+        // Cambia al estado ConcreteStateA.
+        this.context.transitionTo(new ConcreteStateA());
     }
 }
 
 /**
- * El código del cliente.
- * Aquí se crea una instancia del contexto con el estado inicial ConcreteStateA.
+ * Código del cliente.
  */
-const context = new Context(new ConcreteStateA()); 
-context.request1(); // Realizamos la solicitud 1, que provocará un cambio de estado.
-context.request2(); // Realizamos la solicitud 2, que puede o no cambiar el estado.
+const context = new Context(new ConcreteStateA()); // Inicializa el contexto en ConcreteStateA.
+context.request1(); // Llama a request1, lo que cambiará a ConcreteStateB.
+context.request2(); // Llama a request2 en ConcreteStateB, lo que cambiará de nuevo a ConcreteStateA.

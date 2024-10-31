@@ -130,7 +130,7 @@ class SalaryManager {
 }
 
 // Configurador de la aplicación que monta distintas pilas de decoradores
-class ApplicationConfigurator {
+class ApplicationConfiguratorR2 {
     configurationExample(): void {
         let source: DataSource = new FileDataSource("salary.dat");
 
@@ -155,5 +155,5 @@ class ApplicationConfigurator {
 const appDe = new ApplicationDe();
 appDe.dumbUsageExample();
 
-const configurator = new ApplicationConfigurator();
+const configurator = new ApplicationConfiguratorR2();
 configurator.configurationExample();

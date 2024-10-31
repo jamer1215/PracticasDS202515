@@ -61,13 +61,13 @@ class CandyVE extends ItemVE{
         super(price);
     }
     
-        //innecesario hacerlo porque por polimorfismo de subtipos es aceptable de la clase padre
+        //sobreescritura por redefinición
 
-    // accept(v:VisitorVE):void{
+     accept(v:VisitorVE):void{
 
-    //     v.visitCandy(this)
+         v.visitCandy(this)
 
-    // }
+     }
     
 }
 
@@ -76,13 +76,11 @@ class VegetableVE extends ItemVE{
         super(price);
     }
 
-    //innecesario hacerlo porque por polimorfismo de subtipos es aceptable de la clase padre
+     accept(v:VisitorVE):void{
 
-    // accept(v:VisitorVE):void{
+        v.visitVegetable(this)
 
-    //     v.visitVegetable(this)
-
-    // }
+     }
 }
 
 //EL VISITOR que busca el mas baratp:
@@ -164,33 +162,42 @@ class VegetalVisitor implements VisitorVE{
         
     }
 
-    //si
-    visitPaquete(pa: PaqueteVE): void {
+    // //si
+    // visitPaquete(pa: PaqueteVE): void {
 
-        const vegetalesArray = pa.productos.filter(pro=>pro instanceof VegetableVE);
+    //     const vegetalesArray = pa.productos.filter(pro=>pro instanceof VegetableVE);
 
-        for (let ve of vegetalesArray){
-            if(this.x>=vegetalesArray.length){
-                //ve.accept(this);
-                this.visitVegetable(ve)
-                this.vegetalesDecrementados.push(ve)
-            }
-        }
+    //     for (let ve of vegetalesArray){
+    //         if(this.x>=vegetalesArray.length){
+    //             //ve.accept(this);
+    //             this.visitVegetable(ve)
+    //             this.vegetalesDecrementados.push(ve)
+    //         }
+    //     }
         
-    }
+    // }
+
     //no
     visitCandy(ca: CandyVE): void {
         
     }
 
     //si
+    //nota: no seas pendejo y olvidate del instanceof + downcasting
     visitVegetable(ve: VegetableVE): void {
+        //agregamos a la colección destinada para ello los vegetales que se les aplica el descuento
+        //según lo que se reciba por parámetro al invocar este método, así no usas instanceof
+  
+        ve.price = ve.price - (ve.price * this.porcentajeDescuento) / 100;
+        this.vegetalesDecrementados.push(ve);
+    }
 
-        //al vegetal que paso por parámetro le decremento su precio en un N%
-        ve.price=ve.price-(ve.price*this.porcentajeDescuento)/100
-
-
-        
+    visitPaquete(pa: PaqueteVE): void {
+        if (pa.productos.length >= this.x) {
+            for (let pro of pa.productos) {
+                pro.accept(this);
+            }
+        }
     }
     
     getVegetalesDecrementados():VegetableVE[]{
@@ -210,7 +217,7 @@ const v1 = new VegetableVE(8);
 const fuego = new VegetableVE(1)
 const vegetable2 = new VegetableVE(88);
 
-const paquete = new PaqueteVE([c1, c2, c3, v1,fuego]);
+const paquete = new PaqueteVE([c1, c2, c3, v1,fuego,vegetable2]);
 
 const visitor = new ProductsVisitor();
 paquete.accept(visitor); // Empezamos el recorrido visitando el paquete
@@ -223,7 +230,7 @@ const masBarato = visitor.getMasBarato();
 //(4 puntos) Aplicando de nuevo el patron Visitor, desarrollar un nuevo visitador que se
 // encargue de decrementar el precio de todos los vegetales en un producto con x unidades de
 // vegetales.
-const visitorVege = new VegetalVisitor(8,50)
+const visitorVege = new VegetalVisitor(1,50)
 paquete.accept(visitorVege)
 
 const vegetDecr=visitorVege.getVegetalesDecrementados();

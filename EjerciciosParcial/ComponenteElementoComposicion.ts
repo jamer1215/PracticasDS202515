@@ -4,8 +4,8 @@ interface FuncionF<T> {
 
 //una clase random, sencilla y sin tanta locura que se me ocurrió con la excusa de probar nada más, sin rebuscarme
 class OperacionesM implements FuncionF<number> {
-    aplicar(e: ElementoE<number>) {
-        console.log(e.valor * 2); // Multiplicamos el valor por 2 y lo mostramos
+    aplicar(e: ElementoE<number>):void {
+       console.log(`Elemento de valor ${e.valor} con el aplicar realizado resulta:${e.valor * 2}`); // Multiplicamos el valor por 2 y lo mostramos
     }
 }
 
@@ -28,11 +28,11 @@ class ComposicionC<T> extends ComponenteC<T> {
 
         if (this.componentes.length > 0) { // Verifica si hay componentes
             for (let eleme of this.componentes) {
-                if (eleme instanceof ElementoE) { // Verifica si el elemento es del tipo ElementoE
-                    ele.push(eleme); // Agrega el elemento al array
-                } else if (eleme instanceof ComposicionC) { // Verifica si es de tipo ComposicionC
-                    ele = ele.concat(eleme.getElementos()); // Concatena los elementos de las composiciones
-                }
+                ele.push(...eleme.getElementos()); // Agrega el elemento al array
+                //El método getElementos() devuelve un array de elementos. Para asegurarte de que todos los elementos de ese 
+                //array se agreguen correctamente a ele, debes usar el operador de propagación ... para "expandir" ese array y agregar cada elemento individualmente.
+                //De esta forma, si getElementos() devuelve un array con varios elementos, todos serán agregados al array ele sin problemas.
+                //es equivalente a hacer: ele.push(getElementos()[1],...,getElementos()[n]) - que sabes tu hasta donde llega n
             }
         }
 
@@ -42,11 +42,7 @@ class ComposicionC<T> extends ComponenteC<T> {
     aplicarC(f: FuncionF<T>) {
         if (this.componentes) {
             for (let e of this.componentes) {
-                if (e instanceof ElementoE) {
-                    f.aplicar(e); // Aplica la función al elemento
-                } else if (e instanceof ComposicionC) {
-                    e.aplicarC(f); // Aplica recursivamente si es una composición
-                }
+                e.aplicarC(f); // Aplica recursivamente si es una composición
             }
         }
     }
@@ -89,4 +85,6 @@ console.log(`Elementos de ele4 del tipo ElementoE:`, eleme4);
 
 // Probando la operación
 const operaciones = new OperacionesM();
-compoN.aplicarC(operaciones); // Aplicar las operaciones a la composición
+
+let apl = compoN.aplicarC(operaciones); // Aplicar las operaciones a la composición
+let apl4 = ele4.aplicarC(operaciones);

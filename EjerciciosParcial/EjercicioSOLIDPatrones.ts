@@ -21,7 +21,7 @@ class Elemento implements Componente {
 
     // Un Elemento no tiene hijos, por lo tanto devuelve un iterador vacío
     getIterator(): Iterador<Componente> {
-        return new IteratorCompos(this);
+        return new IteratorCompos([this]);
     }
 }
 
@@ -56,7 +56,7 @@ class Compositor implements Componente {
 
     // Devuelve un iterador para recorrer los componentes
     getIterator(): Iterador<Componente> {
-        return new IteratorCompos(this);
+        return new IteratorCompos(this.componentes);
     }
 }
 
@@ -65,13 +65,9 @@ class IteratorCompos implements Iterador<Componente> {
     private index = 0;//elemento i del array, empieza en el primero
     private componentes: Componente[] = [];
 
-    constructor(root: Componente) {
-        // Si es un compositor, agregamos sus hijos. Si no, agregamos solo el elemento.
-        if (root.isComposite()) {
-            this.componentes = (root as Compositor)["componentes"];//lo del downcasting que explica Calonzo
-        } else {
-            this.componentes.push(root);
-        }
+    //Cochinada para calonzo, no uses NUNCA instanceof ni esto, ve como solucionas este peo
+    constructor(componentes:Componente[]) {
+        this.componentes=componentes;//eliminamos la cochinada del instance of
     }
 
     next(): Optional<Componente> {
@@ -110,14 +106,16 @@ class Mapper<E, F> {
 // Prueba del Código
 
 const elemento1 = new Elemento(100);
-const elemento2 = new Elemento(200);
+const elemento2 = new Elemento(100);
 const compositor = new Compositor();
 compositor.add(elemento1);
 compositor.add(elemento2);
 
 //prueba de fuego propuesta por Fornari
 const compositorfuego = new Compositor()
+const elemento3 = new Elemento(300);
 compositorfuego.add(compositor);
+compositorfuego.add(elemento3)
 
 const mapper = new Mapper<Componente, number>();
 
@@ -167,6 +165,14 @@ class GrafoIterator implements Iterador<Nodo> {
     constructor(grafo: Grafo) {
         // Iniciamos el recorrido con todos los nodos iniciales en el grafo
         this.stack = [...grafo.getNodos()];
+        //mira mi pana que no te confunda lo del ...
+        //esto se hace con el fin de que this.stack sea una variable independiente de getNodos del grafo
+        //osea si fueran numericos y tengo tipo let a=2 y let b=a después hago b++ entonces b=3 y a=2
+        //pero si fuera como los arrays entonces a=3 tambien, si hago this.stack=grafo.getNodos entonces
+        //ambas variables apuntan exactamente al mismo array en memoria con lo que si haces un cambio de ese array
+        //por ejemplo desde this.stack, tambien el cambio se ve reflejado en la otra variable
+        //es por eso que usamos el operador de propagación ... para hacer que this.stack tenga los mismos elementos
+        //que el arrar grafo.getNodos() solo que ambas variables son de distintas direcciones de memoria
     }
 
     next(): Optional<Nodo> {
@@ -176,6 +182,9 @@ class GrafoIterator implements Iterador<Nodo> {
                 this.visitados.add(nodoActual);
                 // Agregamos los vecinos al stack para continuar el recorrido
                 this.stack.push(...nodoActual.vecinos);
+                //acá el ... cumple el rol de expansor de elementos, osea te ahorras el hacer esto:
+                //this.stack.push(nodoActual.vecinos[0], nodoActual.vecinos[1], ..., nodoActual.vecinos[n]);
+                //El método push en JavaScript permite agregar múltiples elementos al array de una sola vez.
                 return new Optional(nodoActual);
             }
         }
