@@ -75,6 +75,5 @@ observable.add(jamal)
 observable.add(gabriel)
 observable.add(cristhian)
 
-//observable.update();
 
-observable.set(55)
+observable.set(55)//internamente notifica
