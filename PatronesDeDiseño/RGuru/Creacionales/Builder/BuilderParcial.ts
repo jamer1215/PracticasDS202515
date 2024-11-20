@@ -106,7 +106,6 @@ class ConcreteSquareBuilder implements BoardBuilder<Cuadrado, number> {
     this.board.addCasilla(idCasilla, new CuadradoNumerico(valor));
     return this;
   }
-
   addVecino(idCasilla: number, lado: Cuadrado, idVecino: number) {
 
     let casillaOpt = this.board.getCasilla(idCasilla);
@@ -121,11 +120,13 @@ class ConcreteSquareBuilder implements BoardBuilder<Cuadrado, number> {
       // no entra al else = la casilla y/o el vecino no existe(n)
     } else {
       if (!casillaOpt.hasValue()) {
-        this.addCasilla(idCasilla, new Optional());
+        // this.addCasilla(idCasilla, new Optional());
+        throw new Error("ERROR: Hey mi pana mosca esa casilla no existe en el Board")
       }
 
       if (!vecinoOpt.hasValue()) {
-        this.addCasilla(idVecino, new Optional());
+        // this.addCasilla(idVecino, new Optional());
+        throw new Error("ERROR: Hey mi pana mosca ese vecino no existe en el Board")
       }
     }
 
@@ -151,6 +152,7 @@ class Game {
       .addVecino(2, Cuadrado.Izquierda, 1)
       .addVecino(2, Cuadrado.Derecha, 3)
       .addVecino(1, Cuadrado.Abajo,3)
+      .addVecino(1,Cuadrado.Abajo,33)
       .build();
 
     // Admito que le dije a ChatGPT que lo imprima bonito xd - solo es para probar que sirva envés de solo imprimir las casillas así como normalitas
