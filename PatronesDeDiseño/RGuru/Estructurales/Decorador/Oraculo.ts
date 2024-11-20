@@ -11,8 +11,20 @@ class Oracle implements IOracle{
 
 abstract class BaseDecoratorPrinter implements IOracle{
 
-    constructor(private wrappee: IOracle, private mensaje:string){
+    constructor(private wrappee: IOracle){
         this.wrappee=wrappee;
+    }
+
+    printNumber(min: number, max: number): void {
+        this.wrappee.printNumber(min,max);
+    }
+
+}
+
+class PrintFromFirstDecorator extends BaseDecoratorPrinter{
+
+    constructor(wrappee: IOracle, private mensaje:string){
+        super(wrappee)
         this.mensaje=mensaje
     }
 
@@ -24,14 +36,6 @@ abstract class BaseDecoratorPrinter implements IOracle{
         return this.mensaje
     }
     
-
-    printNumber(min: number, max: number): void {
-        this.wrappee.printNumber(min,max);
-    }
-
-}
-
-class WelcomeMessagePrinterDecorator extends BaseDecoratorPrinter{
 
     printNumber(min: number, max: number):void{
 
@@ -46,7 +50,20 @@ class WelcomeMessagePrinterDecorator extends BaseDecoratorPrinter{
     
 }
 
-class GoodbyeMessagePrinterDecorator extends BaseDecoratorPrinter{
+class PrintFromLastDecorator extends BaseDecoratorPrinter{
+    
+    constructor(wrappee: IOracle, private mensaje:string){
+        super(wrappee)
+        this.mensaje=mensaje
+    }
+
+    setMessage(mensaje:string):void{
+        this.mensaje=mensaje
+    }
+
+    getMessage():string{
+        return this.mensaje
+    }
 
     printNumber(min: number, max: number):void{
 
@@ -72,17 +89,17 @@ let mensajeDespedida = `Mensaje - saludo del final`
 console.log("\nprintNumber() de ora:")
 ora.printNumber(min,max)
 
-let welcome:WelcomeMessagePrinterDecorator = new WelcomeMessagePrinterDecorator(ora,mensajeBienvenida)
-console.log("\nprintNumber() de welcome que tiene ora:")
-welcome.printNumber(min,max)
+let fromFirst:PrintFromFirstDecorator = new PrintFromFirstDecorator(ora,mensajeBienvenida)
+console.log("\nprintNumber() de fromFirst que tiene ora:")
+fromFirst.printNumber(min,max)
 
-let goodbye:GoodbyeMessagePrinterDecorator = new GoodbyeMessagePrinterDecorator(welcome,mensajeDespedida)
-console.log("\nprintNumber() de goodbye que tiene welcome")
-goodbye.printNumber(min,max)
+let fromLast:PrintFromLastDecorator = new PrintFromLastDecorator(fromFirst,mensajeDespedida)
+console.log("\nprintNumber() de fromLast que tiene welcome")
+fromLast.printNumber(min,max)
 
 //para hacer la reversión:
-welcome.setMessage(mensajeDespedida)
-goodbye.setMessage(mensajeBienvenida)
+fromFirst.setMessage(mensajeDespedida)
+fromLast.setMessage(mensajeBienvenida)
 
-console.log("\nprintNumber() con la reversión pertinente (Con goodbye porque es el que tiene a welcome)")
-goodbye.printNumber(min,max)
+console.log("\nprintNumber() con la reversión pertinente (Con fromLast porque es el que tiene a welcome)")
+fromLast.printNumber(min,max)
