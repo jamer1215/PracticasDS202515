@@ -2,11 +2,10 @@
 import { Optional } from "../../../Optional";//Ojo, solo por exquisitez mia quise usar Optional para "limpiar" código, se que no es el eje principal del ejercicio
 
 abstract class Casilla<F, V> {
+  private vecinos: Map<F, Casilla<F, V>> = new Map()//esto lo quité del constructor!
   constructor(
-    private vecinos: Map<F, Casilla<F, V>>,
     private valor: Optional<V>
   ) {
-    this.vecinos = new Map();
     this.valor = valor;
   }
 
@@ -40,8 +39,8 @@ enum Cuadrado {
 }
 
 class CuadradoNumerico extends Casilla<Cuadrado, number> {
-  constructor(vecinos: Map<Cuadrado, CuadradoNumerico>, valor: Optional<number>) {
-    super(vecinos, valor);
+  constructor(valor: Optional<number>) {
+    super(valor);
   }
   iguales(valor1: number, valor2: number): boolean {
     return valor1 === valor2;
@@ -99,12 +98,12 @@ interface BoardBuilder<F, V> {
 class ConcreteSquareBuilder implements BoardBuilder<Cuadrado, number> {
   board: Board<Cuadrado, number>;
 
-  constructor(board: Board<Cuadrado, number>) {
-    this.board = board;
+  constructor() {
+    this.board = new Board<Cuadrado, number>();;
   }
 
   addCasilla(idCasilla: number, valor: Optional<number>): BoardBuilder<Cuadrado, number> {
-    this.board.addCasilla(idCasilla, new CuadradoNumerico(new Map(), valor));
+    this.board.addCasilla(idCasilla, new CuadradoNumerico(valor));
     return this;
   }
 
@@ -141,8 +140,7 @@ class ConcreteSquareBuilder implements BoardBuilder<Cuadrado, number> {
 // cliente - sabe que tipo de tablero quiere
 class Game {
   static main(): void {
-    let board = new Board<Cuadrado, number>();
-    let builder = new ConcreteSquareBuilder(board);
+    let builder = new ConcreteSquareBuilder();//bridge
 
     // Construcción del tablero mediante el builder
     builder
@@ -158,14 +156,14 @@ class Game {
     // Admito que le dije a ChatGPT que lo imprima bonito xd - solo es para probar que sirva envés de solo imprimir las casillas así como normalitas
     //(pruebas técnicas mías jejeje)
     console.log("Tablero:");
-    board.getCasillas().forEach((casilla, id) => {
+    builder.board.getCasillas().forEach((casilla, id) => {
       console.log(`Casilla ${id} con valor: ${casilla.getValor().getValue()}`);
 
       console.log("Vecinos:");
       casilla.getVecinos().forEach((vecino, lado) => {
         let vecinoValor = vecino.getValor().getValue();
         console.log(
-          `  Lado: ${Cuadrado[lado]} => Vecino ID: ${board
+          `  Lado: ${Cuadrado[lado]} => Vecino ID: ${builder.board
             .getCasillas()
             .get(id)
             ?.getVecinos()
