@@ -92,6 +92,8 @@ interface BoardBuilder<F, V> {
   addVecino(idCasilla: number, lado: F, idVecino: number): BoardBuilder<F, V>;
 
   build(): Board<F, V>;
+
+  clear():void //resetear el builder (siempre es lo mismo que hace el constructor)
 }
 
 //Como casilla es una clase abstracta, definí el BoardBuilder como interface y mi idea es que cada tipo de casilla tenga un builder particular
@@ -101,6 +103,10 @@ class ConcreteSquareBuilder implements BoardBuilder<Cuadrado, number> {
   constructor() {
     this.board = new Board<Cuadrado, number>();;
   }
+
+  clear(): void {
+    this.board=new Board<Cuadrado,number>()
+}
 
   addCasilla(idCasilla: number, valor: Optional<number>): BoardBuilder<Cuadrado, number> {
     this.board.addCasilla(idCasilla, new CuadradoNumerico(valor));
@@ -134,7 +140,9 @@ class ConcreteSquareBuilder implements BoardBuilder<Cuadrado, number> {
   }
 
   build(): Board<Cuadrado, number> {
-    return this.board;
+    let board = this.board
+    this.clear()//para usar el builder despues pa otra cosa
+    return board;
   }
 }
 
