@@ -145,15 +145,15 @@ class Game {
 
     // Construcción del tablero mediante el builder
     builder
-      .addCasilla(1, new Optional(1))//Ejemplo casilla de id = 1 con valor = 1
-      .addCasilla(2, new Optional(2))
-      .addCasilla(3, new Optional(3))
-      .addVecino(1, Cuadrado.Derecha, 2)//Ejemplo a la casilla de id = 1, en el lado derecho (de esta casilla que es cuadrada), asígnale por vecino la casilla que tiene id = 2
-      .addVecino(2, Cuadrado.Izquierda, 1)
-      .addVecino(2, Cuadrado.Derecha, 3)
-      .addVecino(1, Cuadrado.Abajo,3)
-      .addVecino(1,Cuadrado.Abajo,33)
-      .build();
+    .addCasilla(1, new Optional(1))//Ejemplo casilla de id = 1 con valor = 1
+    .addCasilla(2, new Optional(2))
+    .addCasilla(3, new Optional(3))
+    .addVecino(1, Cuadrado.Derecha, 2)//Ejemplo a la casilla de id = 1, en el lado derecho (de esta casilla que es cuadrada), asígnale por vecino la casilla que tiene id = 2
+    .addVecino(2, Cuadrado.Izquierda, 1)
+    .addVecino(2, Cuadrado.Derecha, 3)
+    .addVecino(1, Cuadrado.Abajo,3)
+    // .addVecino(1,Cuadrado.Abajo,33)
+    .build();
 
     // Admito que le dije a ChatGPT que lo imprima bonito xd - solo es para probar que sirva envés de solo imprimir las casillas así como normalitas
     //(pruebas técnicas mías jejeje)
