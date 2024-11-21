@@ -1,10 +1,10 @@
 interface IOracle{
-    printNumber(min:number, max:number):void
+    printNumber():void
 }
 
 class Oracle implements IOracle{
-    printNumber(min: number, max: number): void {
-        console.log( Math.random() * (max - min + 1) + min);
+    printNumber(): void {
+        console.log( Math.random()*100);
     }
 
 }
@@ -15,8 +15,8 @@ abstract class BaseDecoratorPrinter implements IOracle{
         this.wrappee=wrappee;
     }
 
-    printNumber(min: number, max: number): void {
-        this.wrappee.printNumber(min,max);
+    printNumber(): void {
+        this.wrappee.printNumber();
     }
 
 }
@@ -37,10 +37,10 @@ class PrintFromFirstDecorator extends BaseDecoratorPrinter{
     }
     
 
-    printNumber(min: number, max: number):void{
+    printNumber():void{
 
         this.printMessage()
-        super.printNumber(min,max);
+        super.printNumber();
 
     }
 
@@ -57,7 +57,7 @@ class PrintFromLastDecorator extends BaseDecoratorPrinter{
         this.mensaje=mensaje
     }
 
-    setMessage(mensaje:string):void{
+    setMessage(mensaje:string):void{//Pensandolo bien, mejor recurrir mas a opcion 2 que se ve mas adelante con codigo cliente!
         this.mensaje=mensaje
     }
 
@@ -65,9 +65,9 @@ class PrintFromLastDecorator extends BaseDecoratorPrinter{
         return this.mensaje
     }
 
-    printNumber(min: number, max: number):void{
+    printNumber():void{
 
-        super.printNumber(min,max);
+        super.printNumber();
         this.printMessage()
 
     }
@@ -81,25 +81,30 @@ class PrintFromLastDecorator extends BaseDecoratorPrinter{
 //El asqueroso y horrible, codigo cliente:
 
 let ora: Oracle = new Oracle()
-let min:number = 1
-let max:number = 3
 let mensajeBienvenida = `Mensaje de bienvenida`
 let mensajeDespedida = `Mensaje - saludo del final`
 
 console.log("\nprintNumber() de ora:")
-ora.printNumber(min,max)
+ora.printNumber()
 
 let fromFirst:PrintFromFirstDecorator = new PrintFromFirstDecorator(ora,mensajeBienvenida)
 console.log("\nprintNumber() de fromFirst que tiene ora:")
-fromFirst.printNumber(min,max)
+fromFirst.printNumber()
 
 let fromLast:PrintFromLastDecorator = new PrintFromLastDecorator(fromFirst,mensajeDespedida)
 console.log("\nprintNumber() de fromLast que tiene welcome")
-fromLast.printNumber(min,max)
+fromLast.printNumber()
 
 //para hacer la reversión:
+
+//opcion 1: modificar los mensajes de una estructura decoradora ya creada que es la anterior (mejor evitar esto si fuera una evaluación)
 fromFirst.setMessage(mensajeDespedida)
 fromLast.setMessage(mensajeBienvenida)
 
 console.log("\nprintNumber() con la reversión pertinente (Con fromLast porque es el que tiene a welcome)")
-fromLast.printNumber(min,max)
+fromLast.printNumber()
+
+//Opcion 2, hacemos nuevas instancias para crear la misma estructura decoradora pero pasandole distintos mensajes!
+const decorador2 = new PrintFromLastDecorator(new PrintFromFirstDecorator(ora,mensajeDespedida),mensajeBienvenida)
+console.log("\nprintNumber() con opcion 2 - decorador 2:)")
+decorador2.printNumber()
